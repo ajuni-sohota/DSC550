@@ -1,0 +1,7 @@
+import pandas as pd
+
+# Reads in your file as json
+df = pd.read_json('data/income.json', lines=True)
+
+# Write it back out as a csv
+df.to_csv("data/income.csv")
