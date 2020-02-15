@@ -13,97 +13,17 @@ class SqliteCorpusReader(object):
     def __init__(self, path):
         self._cur = sqlite3.connect(path).cursor()
 
-    def scores(self):
-        """
-        Returns the review score
-        """
-        self._cur.execute("SELECT score FROM reviews")
-        scores = self._cur.fetchall()
-        for score in scores:
-            yield score
-
-    def texts(self):
-        """
-        Returns the full review texts
-        """
-        self._cur.execute("SELECT content FROM content")
+    def text(self):
+        self._cur.execute("SELECT txt FROM categorized_comments")
         texts = self._cur.fetchall()
         for text in texts:
             yield text
 
-    def ids(self):
-        """
-        Returns the review ids
-        """
-        self._cur.execute("SELECT reviewid FROM content")
-        ids = self._cur.fetchall()
-        for idx in ids:
-            yield idx
-
-    def ids_and_texts(self):
-        """
-        Returns the review ids
-        """
-        self._cur.execute("SELECT * FROM content")
-        results = self._cur.fetchall()
-        for idx,text in results:
-            yield idx,text
-
-    def scores_albums_artists_texts(self):
-        """
-        Returns a generator with each review represented as a
-        (score, album name, artist name, review text) tuple
-        """
-        sql = """
-              SELECT S.score, L.label, A.artist, R.content
-              FROM [reviews] S
-              JOIN labels L ON S.reviewid=L.reviewid
-              JOIN artists A on L.reviewid=A.reviewid
-              JOIN content R ON A.reviewid=R.reviewid
-              """
-        self._cur.execute(sql)
-        results = self._cur.fetchall()
-        for score,album,band,text in results:
-            yield (score,album,band,text)
-
-    def albums(self):
-        """
-        Returns the names of albums being reviewed
-        """
-        self._cur.execute("SELECT * FROM labels")
-        albums = self._cur.fetchall()
-        for idx,album in albums:
-            yield idx,album
-
-    def artists(self):
-        """
-        Returns the name of the artist being reviewed
-        """
-        self._cur.execute("SELECT * FROM artists")
-        artists = self._cur.fetchall()
-        for idx,artist in artists:
-            yield idx,artist
-
-    def genres(self):
-        """
-        Returns the music genre of each review
-        """
-        self._cur.execute("SELECT * FROM genres")
-        genres = self._cur.fetchall()
-        for idx,genre in genres:
-            yield idx,genre
-
-    def years(self):
-        """
-        Returns the publication year of each review
-
-        Note: There are many missing values
-        """
-        self._cur.execute("SELECT * FROM years")
-        years = self._cur.fetchall()
-        for idx,year in years:
-            yield idx,year
-
+    def categories(self):
+        self._cur.execute("SELECT cat FROM categorized_comments")
+        cats = self._cur.fetchall()
+        for cat in cats:
+            yield cat
     def paras(self):
         """
         Returns a generator of paragraphs.
@@ -199,8 +119,8 @@ class PickledReviewsReader(CorpusReader):
             yield token[0]
 
 
-if __name__ == '__main__':
-    # Download the data from https://www.kaggle.com/nolanbconaway/pitchfork-data/data
-    # preprocess by running preprocess.py to produce pickled corpus
-    reader = PickledReviewsReader('../review_corpus_proc')
-    print(len(list(reader.reviews())))
+# if __name__ == '__main__':
+#     # Download the data from https://www.kaggle.com/nolanbconaway/pitchfork-data/data
+#     # preprocess by running preprocess.py to produce pickled corpus
+#     reader = PickledReviewsReader('../review_corpus_proc')
+#     print(len(list(reader.reviews())))
